@@ -740,11 +740,11 @@ void loop() {
           if (flag_autoteste) {  //Lê correte de estimulação e luz incidida na fotomultiplicadora
             dado_int = dado.toInt();
             luz_de_referencia += dado_int;
-            iled_leitura += analogRead(A1);
+            iled_leitura += analogRead(A12);
           } else {
-            iled_leitura = analogRead(A1);
+            iled_leitura = analogRead(A12);
             exibir_corrente_LED_leit(iled_leitura);
-            int dens_pot_led_leitura = analogRead(A0)*4.88;
+            int dens_pot_led_leitura = analogRead(A10)*4.88;
             exibir_densidade_pot_LED_leit(dens_pot_led_leitura);
             exibirDadosHP10(dado);  //reporta os dados ao supervisório
           }
@@ -1373,7 +1373,7 @@ void exibir_VPMT() {
 //==================================================================
 void exibir_corrente_LED_leit(int iled) {
   // corrente led: #L1%Exxxxxx&
-  iled = iled * 8 + 18;  //mA
+  iled = (iled*3.36745);  //mA
   String iled_string = (String)iled;
   if (iled >= 0 && iled <= 9) {
     Serial.print("#L1%E000000" + iled_string + "&");
