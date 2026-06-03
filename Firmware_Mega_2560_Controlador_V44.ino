@@ -39,6 +39,12 @@
    Hora: 13:27 implementação do versionamento via git e github.
 */
 
+/* Atualização
+   Dia: 03/06/2026
+   Autor: Willian
+   Hora: 10:50 implementação da leitura da densidade de corrente do led.
+*/
+
 //#S1%M1G3L03000P4Z05000Q2& --modo automático padrão
 
 //sequência de comandos no modo automático:
@@ -62,7 +68,7 @@
 
 //Como usar os comandos para testes SIMPLES
 // autoteste -> escreva #S1%M3G3L03000P2Z03000Q4& e depois #S1%C0011&
-// Leitura led -> escreva #S1%M1G3L60000P4Z01000Q4& e depois #S1%SC1001&
+// Leitura led -> escreva #S1%M1G3L06000P4Z01000Q4& e depois #S1%SC1001&
 // Fazer zeramento -> escreva #S1%M3G3L60000P2Z03000Q4& e depois #S1%SC1011&
 // Parar leitura #S1%C1010&
 
@@ -725,7 +731,7 @@ void loop() {
       liga_led();
       //Serial2.print("start&");
       Serial1.print("start&");  //placa protótipo usa a serial 1 e não a serial 2
-      Serial.print("start&");
+      //Serial.print("start&");
       break;
     case 10:  //Acionar o periférico contagem para fazer leitura hp10 ou luz de referência
       if (novoDado) {
@@ -738,8 +744,8 @@ void loop() {
           } else {
             iled_leitura = analogRead(A1);
             exibir_corrente_LED_leit(iled_leitura);
-            double dens_pot_led_leitura = analogRead(A1)*0.00488;
-            exibir_denidade_pot_LED_leit(dens_pot_led_leitura);
+            int dens_pot_led_leitura = analogRead(A0)*4.88;
+            exibir_densidade_pot_LED_leit(dens_pot_led_leitura);
             exibirDadosHP10(dado);  //reporta os dados ao supervisório
           }
           canal++;
@@ -1384,30 +1390,30 @@ void exibir_corrente_LED_leit(int iled) {
   } else if (iled >= 1000000 && iled < 1900000) {
     Serial.print("#L1%E" + iled_string + "&");
   } else if (iled >= 1900000) {
-    Serial.print("#L1%EsatLeit&");  // verificar valor de sat PMT
+    Serial.print("#L1%EsatLeit&");  // verificar valor de sat corr
   }
 }
 //==================================================================
-void exibir_corrente_LED_leit(int dens_pot_led) {
-  // corrente led: #L1%Exxxxxx&
-  dens_pot_led = iled * 0.004822;  //V
-  String iled_string = (String)iled;
-  if (iled >= 0 && iled <= 9) {
-    Serial.print("#L1%E000000" + iled_string + "&");
-  } else if (iled >= 10 && iled <= 99) {
-    Serial.print("#L1%E00000" + iled_string + "&");
-  } else if (iled >= 100 && iled <= 999) {
-    Serial.print("#L1%E0000" + iled_string + "&");
-  } else if (iled >= 1000 && iled <= 9999) {
-    Serial.print("#L1%E000" + iled_string + "&");
-  } else if (iled >= 10000 && iled <= 99999) {
-    Serial.print("#L1%E00" + iled_string + "&");
-  } else if (iled >= 100000 && iled <= 999999) {
-    Serial.print("#L1%E0" + iled_string + "&");
-  } else if (iled >= 1000000 && iled < 1900000) {
+void exibir_densidade_pot_LED_leit(int dens_pot_led) {
+  // densidade_led: #L1%Dxxxxxx&
+  //mV
+  String iled_string = (String)dens_pot_led;
+  if (dens_pot_led >= 0 && dens_pot_led <= 9) {
+    Serial.print("#L1%D000000" + iled_string + "&");
+  } else if (dens_pot_led >= 10 && dens_pot_led <= 99) {
+    Serial.print("#L1%D00000" + iled_string + "&");
+  } else if (dens_pot_led >= 100 && dens_pot_led <= 999) {
+    Serial.print("#L1%D0000" + iled_string + "&");
+  } else if (dens_pot_led >= 1000 && dens_pot_led <= 9999) {
+    Serial.print("#L1%D000" + iled_string + "&");
+  } else if (dens_pot_led >= 10000 && dens_pot_led <= 99999) {
+    Serial.print("#L1%D00" + iled_string + "&");
+  } else if (dens_pot_led >= 100000 && dens_pot_led <= 999999) {
+    Serial.print("#L1%D0" + iled_string + "&");
+  } else if (dens_pot_led >= 1000000 && dens_pot_led < 1900000) {
     Serial.print("#L1%E" + iled_string + "&");
-  } else if (iled >= 1900000) {
-    Serial.print("#L1%EsatLeit&");  // verificar valor de sat PMT
+  } else if (dens_pot_led >= 1900000) {
+    Serial.print("#L1%DsatLeit&");  // verificar valor de sat dens
   }
 }
 //==================================================================
