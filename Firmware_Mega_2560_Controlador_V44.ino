@@ -234,7 +234,8 @@ int contador_time_out_mod_contador = 0;
 unsigned long time_out_mod_motor = 0;
 int contador_time_out_mod_motor = 0;
 //*****************************************************************
-
+double dens_pot_led_leitura = 0;
+int contador_media_dens_corrente = 0;
 
 void setup() {
   Serial.begin(115200);   //comunicação com PC
@@ -734,6 +735,9 @@ void loop() {
       //Serial.print("start&");
       break;
     case 10:  //Acionar o periférico contagem para fazer leitura hp10 ou luz de referência
+      iled_leitura += analogRead(A12);
+      dens_pot_led_leitura += analogRead(A10) * 4.79; //(mV)
+      contador_media_dens_corrente += 1;
       if (novoDado) {
         time_out_mod_contador = millis();
         if (canal < numeroCanais) {
@@ -742,11 +746,14 @@ void loop() {
             luz_de_referencia += dado_int;
             iled_leitura += analogRead(A12);
           } else {
-            iled_leitura = analogRead(A12);
-            exibir_corrente_LED_leit(iled_leitura);
-            int dens_pot_led_leitura = analogRead(A10)*4.88;
-            exibir_densidade_pot_LED_leit(dens_pot_led_leitura);
+            exibir_corrente_LED_leit(iled_leitura/contador_media_dens_corrente);
+            exibir_densidade_pot_LED_leit(dens_pot_led_leitura/contador_media_dens_corrente);
+            //Serial.println(dens_pot_led_leitura/contador_media_dens_corrente);
             exibirDadosHP10(dado);  //reporta os dados ao supervisório
+            
+            contador_media_dens_corrente = 0;
+            iled_leitura = 0;
+            dens_pot_led_leitura = 0;
           }
           canal++;
         } else {
@@ -1350,7 +1357,7 @@ void exibir_VPMT() {
   // tensão pmt: #L1%Vxxxxxx&
   int analogPin = A0;
   int VPMT = analogRead(analogPin);
-  VPMT = VPMT * 4.88;  //(mV)
+  VPMT = VPMT * 4.79;  //(mV)
   String vpmt_string = (String)VPMT;
   if (VPMT >= 0 && VPMT <= 9) {
     Serial.print("#L1%V000000" + vpmt_string + "&");
@@ -1373,7 +1380,7 @@ void exibir_VPMT() {
 //==================================================================
 void exibir_corrente_LED_leit(int iled) {
   // corrente led: #L1%Exxxxxx&
-  iled = (iled*3.36745);  //mA
+  iled = (iled * 3.2);  //mA
   String iled_string = (String)iled;
   if (iled >= 0 && iled <= 9) {
     Serial.print("#L1%E000000" + iled_string + "&");
@@ -1392,6 +1399,7 @@ void exibir_corrente_LED_leit(int iled) {
   } else if (iled >= 1900000) {
     Serial.print("#L1%EsatLeit&");  // verificar valor de sat corr
   }
+  //Serial.println(); //apagar para o funcionamento normal
 }
 //==================================================================
 void exibir_densidade_pot_LED_leit(int dens_pot_led) {
