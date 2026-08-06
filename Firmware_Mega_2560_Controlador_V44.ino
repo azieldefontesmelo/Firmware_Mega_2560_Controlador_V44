@@ -112,6 +112,7 @@ String desabilitar_botao = "#S1%C1010&";   //equipamento
 String iniciar_modo_zerar = "#S1%C1011&";  //zerar dosímetro
 //  Instruções que pulam a mecânica
 String SUDO_leitura = "#S1%SC1001&";  //Leitura sem passar pela mecânica
+String SUDO_ruido = "#S1%SC1101&";    //leitura sem ligar led
 String SUDO_stop = "#S1%SC1010&";     //para a leitura e desliga led sem passar pela mecânica
 String SUDO_zerar = "#S1%SC1011&";    //Liga o led de zeramento sem passar pela mecânica
 String SUDO_ligaLed = "#S1%SC1100&";  //Liga led de leitura sem passar pela mecânica
@@ -200,6 +201,7 @@ boolean flag_p_SUDO_leitura = false;
 boolean flag_p_SUDO_stop = false;
 boolean flag_p_SUDO_zerar = false;
 boolean flag_p_SUDO_ligaLed = false;
+boolean flag_p_SUDO_ruido = false;
 boolean flag_sudo = false;
 //*****************************************************************
 //variáveis de informaçoes do autoteste
@@ -432,6 +434,15 @@ void loop() {
         flag_sudo = true;
         flag_autoteste = false;
         estado = 9;
+      }
+
+      if (flag_p_SUDO_ruido) {
+        flag_p_SUDO_ruido = false;
+        //Serial.println("Comando sudo leitura recebido");
+        Serial1.print("start&");
+        flag_sudo = true;
+        flag_autoteste = false;
+        estado = 10;
       }
 
       if (flag_p_SUDO_zerar) {
@@ -746,10 +757,10 @@ void loop() {
             luz_de_referencia += dado_int;
             iled_leitura += analogRead(A12);
           } else {
+            exibirDadosHP10(dado);  //reporta os dados ao supervisório
             exibir_corrente_LED_leit(iled_leitura/contador_media_dens_corrente);
             exibir_densidade_pot_LED_leit(dens_pot_led_leitura/contador_media_dens_corrente);
             //Serial.println(dens_pot_led_leitura/contador_media_dens_corrente);
-            exibirDadosHP10(dado);  //reporta os dados ao supervisório
             
             contador_media_dens_corrente = 0;
             iled_leitura = 0;
@@ -1519,17 +1530,20 @@ int calcula_ganho_pmt(char ganho) {
   //    Serial.print("Ganho: ");
   //    Serial.println(ganho);
   switch (ganho) {  // ganho da pmt
-    case '1':
-      return 40;  //43 resultou em um ganho de 300 //50 resultou em multiplicador de 1224 vezes tudo isso a 10mSV
-      break;
-    case '2':
-      return 30;  //29 resultou em um fator de 10 vezes //31 resultou em um fator de 15 vezes  //34 resultou em multiplicador de 22 vezes      // 27 resultou em multiplicador x5 tudo isso a 10mSV
-      break;
-    case '3':
-      return 15;  //15 : 0,99830V //14 : 1,00237V
-      break;
     case '0':
       return 50;
+      break;
+    case '1':
+      return 40;  //montagem 08/07/26: 0,88V //43 resultou em um ganho de 300 //50 resultou em multiplicador de 1224 vezes tudo isso a 10mSV
+      break;
+    case '2':
+      return 30;  //montagem 08/07/26: 0,92V //29 resultou em um fator de 10 vezes //31 resultou em um fator de 15 vezes  //34 resultou em multiplicador de 22 vezes      // 27 resultou em multiplicador x5 tudo isso a 10mSV
+      break;
+    case '3':
+      return 15;  //montagem 08/07/26: 0,982V //15 : 0,99830V //14 : 1,00237V
+      break;
+    case '4':
+      return 10;  //montagem 08/07/26: 1,003V
       break;
   }
 }
