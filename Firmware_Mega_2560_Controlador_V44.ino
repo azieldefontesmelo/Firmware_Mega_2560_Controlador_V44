@@ -747,7 +747,7 @@ void loop() {
       break;
     case 10:  //Acionar o periférico contagem para fazer leitura hp10 ou luz de referência
       iled_leitura += analogRead(A12);
-      dens_pot_led_leitura += analogRead(A10) * 4.79; //(mV)
+      dens_pot_led_leitura += analogRead(A10) * 4.79;  //(mV)
       contador_media_dens_corrente += 1;
       if (novoDado) {
         time_out_mod_contador = millis();
@@ -758,10 +758,10 @@ void loop() {
             iled_leitura += analogRead(A12);
           } else {
             exibirDadosHP10(dado);  //reporta os dados ao supervisório
-            exibir_corrente_LED_leit(iled_leitura/contador_media_dens_corrente);
-            exibir_densidade_pot_LED_leit(dens_pot_led_leitura/contador_media_dens_corrente);
+            exibir_corrente_LED_leit(iled_leitura / contador_media_dens_corrente);
+            exibir_densidade_pot_LED_leit(dens_pot_led_leitura / contador_media_dens_corrente);
             //Serial.println(dens_pot_led_leitura/contador_media_dens_corrente);
-            
+
             contador_media_dens_corrente = 0;
             iled_leitura = 0;
             dens_pot_led_leitura = 0;
@@ -1278,17 +1278,49 @@ void exibirDadosHP10(String dado) {
     Serial.print("#L1%A0000000" + dado + "&");
   } else if (contador >= 100 && contador <= 999) {
     Serial.print("#L1%A000000" + dado + "&");
-  } else if (contador >= 1000 && contador <= 9999) {
+  } else if (contador >= 1000 && contador <= 1700) {
+    Serial.print("#L1%A00000" + dado + "&");
+  } else if (contador >= 1700 && contador <= 9999) {
+    //estado = 0;
+    //desliga_led();
+    //Serial2.print("stop&");
+    //Serial1.print("stop&");  //placa protótipo
+    //Serial.print("#L1%AsatLeit&");
     Serial.print("#L1%A00000" + dado + "&");
   } else if (contador >= 10000 && contador <= 99999) {
+    //estado = 0;
+    //desliga_led();
+    //Serial2.print("stop&");
+    //Serial1.print("stop&");  //placa protótipo
+    //Serial.print("#L1%AsatLeit&");
     Serial.print("#L1%A0000" + dado + "&");
   } else if (contador >= 100000 && contador <= 999999) {
+    //estado = 0;
+    //desliga_led();
+    //Serial2.print("stop&");
+    //Serial1.print("stop&");  //placa protótipo
+    //Serial.print("#L1%AsatLeit&");
     Serial.print("#L1%A000" + dado + "&");
   } else if (contador >= 1000000 && contador < 9999999) {
+    //estado = 0;
+    //desliga_led();
+    //Serial2.print("stop&");
+    //Serial1.print("stop&");  //placa protótipo
+    //Serial.print("#L1%AsatLeit&");
     Serial.print("#L1%A00" + dado + "&");
   } else if (contador >= 10000000 && contador < 99999999) {
+    //estado = 0;
+    //desliga_led();
+    //Serial2.print("stop&");
+    //Serial1.print("stop&");  //placa protótipo
+    //Serial.print("#L1%AsatLeit&");
     Serial.print("#L1%A0" + dado + "&");
   } else if (contador >= 100000000 && contador < 999999999) {
+    //estado = 0;
+    //desliga_led();
+    //Serial2.print("stop&");
+    //Serial1.print("stop&");  //placa protótipo
+    //Serial.print("#L1%AsatLeit&");
     Serial.print("#L1%A" + dado + "&");
   }
 
