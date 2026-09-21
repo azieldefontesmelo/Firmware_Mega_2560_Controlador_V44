@@ -1309,19 +1309,19 @@ void exibirDadosHP10(String dado) {
     //Serial.print("#L1%AsatLeit&");
     Serial.print("#L1%A00" + dado + "&");
   } else if (contador >= 10000000 && contador < 99999999) {
-    //estado = 0;
-    //desliga_led();
-    //Serial2.print("stop&");
-    //Serial1.print("stop&");  //placa protótipo
-    //Serial.print("#L1%AsatLeit&");
-    Serial.print("#L1%A0" + dado + "&");
+    estado = 0;
+    desliga_led();
+    Serial2.print("stop&");
+    Serial1.print("stop&");  //placa protótipo
+    Serial.print("#L1%AsatLeit&");
+    //Serial.print("#L1%A0" + dado + "&");
   } else if (contador >= 100000000 && contador < 999999999) {
-    //estado = 0;
-    //desliga_led();
-    //Serial2.print("stop&");
-    //Serial1.print("stop&");  //placa protótipo
-    //Serial.print("#L1%AsatLeit&");
-    Serial.print("#L1%A" + dado + "&");
+    estado = 0;
+    desliga_led();
+    Serial2.print("stop&");
+    Serial1.print("stop&");  //placa protótipo
+    Serial.print("#L1%AsatLeit&");
+    //Serial.print("#L1%A" + dado + "&");
   }
 
   //------------------------------------------------------------------
