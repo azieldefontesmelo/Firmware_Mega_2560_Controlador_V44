@@ -68,7 +68,7 @@
 
 //Como usar os comandos para testes SIMPLES
 // autoteste -> escreva #S1%M3G3L03000P2Z03000Q4& e depois #S1%C0011&
-// Leitura led -> escreva #S1%M1G3L06000P4Z01000Q4& e depois #S1%SC1001&
+// Leitura led -> escreva #S1%M1G4L03000P4Z01000Q4& e depois #S1%SC1001&
 // Fazer zeramento -> escreva #S1%M3G3L60000P2Z03000Q4& e depois #S1%SC1011&
 // Parar leitura #S1%C1010&
 
@@ -228,6 +228,7 @@ unsigned int contador_falhas_mec = 0;
 boolean flag_saturacao_pmt_p4 = false;
 boolean flag_saturacao_pmt_p3 = false;
 double f_correcao_pmt = 1;
+long int limiar_sat = 20000000;
 //*****************************************************************
 unsigned long time_out_supervisorio = 0;
 int contador_time_out_supervisorio = 0;
@@ -1238,7 +1239,7 @@ void exibirDadosHP10(String dado) {
   //lcd.print(dado);
   //lcd.print("--");
   //------------------------------------------------------------------
-  if (contador >= (2000000 * f_correcao_pmt) && !flag_saturacao_pmt_p3) {
+  if (contador >= (limiar_sat)) { /*
     if (potenciaLEDLAux == "4") {
       if (!flag_saturacao_pmt_p4) {
         desliga_led();
@@ -1269,69 +1270,37 @@ void exibirDadosHP10(String dado) {
         Serial1.print("start&");  //placa protótipo
         liga_led();
       }
+    }*/
+    desliga_led();
+    Serial2.print("stop&");
+    Serial1.print("stop&");  //placa protótipo
+    estado = 0;
+    Serial.print("#L1%AsatLeit&");
+  } else {
+    //-------------------------------------------------------------------
+    if (contador >= 0 && contador <= 9) {
+      Serial.print("#L1%A00000000" + dado + "&");
+    } else if (contador >= 10 && contador <= 99) {
+      Serial.print("#L1%A0000000" + dado + "&");
+    } else if (contador >= 100 && contador <= 999) {
+      Serial.print("#L1%A000000" + dado + "&");
+    } else if (contador >= 1000 && contador <= 1700) {
+      Serial.print("#L1%A00000" + dado + "&");
+    } else if (contador >= 1700 && contador <= 9999) {
+      Serial.print("#L1%A00000" + dado + "&");
+    } else if (contador >= 10000 && contador <= 99999) {
+      Serial.print("#L1%A0000" + dado + "&");
+    } else if (contador >= 100000 && contador < 200000) {
+      Serial.print("#L1%A0000" + dado + "&");
+    } else if (contador >= 200000 && contador <= 999999) {
+      Serial.print("#L1%A000" + dado + "&");
+    } else if (contador >= 1000000 && contador < 9999999) {
+      Serial.print("#L1%A00" + dado + "&");
+    } else if (contador >= 10000000 && contador < 99999999) {
+      Serial.print("#L1%A0" + dado + "&");
+    } else if (contador >= 100000000 && contador < 999999999) {
+      Serial.print("#L1%A" + dado + "&");
     }
-  }
-  //-------------------------------------------------------------------
-  if (contador >= 0 && contador <= 9) {
-    Serial.print("#L1%A00000000" + dado + "&");
-  } else if (contador >= 10 && contador <= 99) {
-    Serial.print("#L1%A0000000" + dado + "&");
-  } else if (contador >= 100 && contador <= 999) {
-    //estado = 0;
-    //desliga_led();
-    //Serial2.print("stop&");
-    //Serial1.print("stop&");  //placa protótipo
-    //Serial.print("#L1%AsatLeit&");
-    Serial.print("#L1%A000000" + dado + "&");
-  } else if (contador >= 1000 && contador <= 1700) {
-    //estado = 0;
-    //desliga_led();
-    //Serial2.print("stop&");
-    //Serial1.print("stop&");  //placa protótipo
-    //Serial.print("#L1%AsatLeit&");
-    Serial.print("#L1%A00000" + dado + "&");
-  } else if (contador >= 1700 && contador <= 9999) {
-    estado = 0;
-    desliga_led();
-    Serial2.print("stop&");
-    Serial1.print("stop&");  //placa protótipo
-    Serial.print("#L1%AsatLeit&");
-    //Serial.print("#L1%A00000" + dado + "&");
-  } else if (contador >= 10000 && contador <= 99999) {
-    estado = 0;
-    desliga_led();
-    Serial2.print("stop&");
-    Serial1.print("stop&");  //placa protótipo
-    Serial.print("#L1%AsatLeit&");
-    //Serial.print("#L1%A0000" + dado + "&");
-  } else if (contador >= 100000 && contador <= 999999) {
-    estado = 0;
-    desliga_led();
-    Serial2.print("stop&");
-    Serial1.print("stop&");  //placa protótipo
-    Serial.print("#L1%AsatLeit&");
-    //Serial.print("#L1%A000" + dado + "&");
-  } else if (contador >= 1000000 && contador < 9999999) {
-    estado = 0;
-    desliga_led();
-    Serial2.print("stop&");
-    Serial1.print("stop&");  //placa protótipo
-    Serial.print("#L1%AsatLeit&");
-    //Serial.print("#L1%A00" + dado + "&");
-  } else if (contador >= 10000000 && contador < 99999999) {
-    estado = 0;
-    desliga_led();
-    Serial2.print("stop&");
-    Serial1.print("stop&");  //placa protótipo
-    Serial.print("#L1%AsatLeit&");
-    //Serial.print("#L1%A0" + dado + "&");
-  } else if (contador >= 100000000 && contador < 999999999) {
-    estado = 0;
-    desliga_led();
-    Serial2.print("stop&");
-    Serial1.print("stop&");  //placa protótipo
-    Serial.print("#L1%AsatLeit&");
-    //Serial.print("#L1%A" + dado + "&");
   }
 
   //------------------------------------------------------------------
@@ -1645,6 +1614,9 @@ void trata_palavra_supervisorio() {
     if (palavra.substring(4, 5) == "M") {
       definirParametros();
       aplicarParametros();
+    }
+    if (palavra.substring(4, 5) == "O") { //#S1%OXXXXXXXX&
+      limiar_sat = palavra.substring(5, 13).toInt();
     }
     if (palavra == iniciar) {
       flag_p_iniciar = true;
